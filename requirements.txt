@@ -1,5 +1,6 @@
 streamlit
-openai
 pandas
-pillow
+numpy
 plotly
+openpyxl
+scikit-learn
