@@ -445,7 +445,11 @@ topics = [t.lower() for t in topics_display]
 fmt_col, gen_col, upload_col, btn_col = st.columns([1, 2, 1, 1])
 
 # Format mapping
-format_files = glob.glob('data/edag_question_formats/*.txt')
+#format_files = glob.glob('data/edag_question_formats/*.txt')
+#format_names = [os.path.basename(f) for f in format_files]
+#display_formats = [os.path.splitext(name)[0].replace('_', ' ').title() for name in format_names]
+#fmt_map = dict(zip(display_formats, format_names))
+format_files = glob.glob(os.path.join(BASE_DIR, "data", "edag_question_formats", "*.txt"))
 format_names = [os.path.basename(f) for f in format_files]
 display_formats = [os.path.splitext(name)[0].replace('_', ' ').title() for name in format_names]
 fmt_map = dict(zip(display_formats, format_names))
@@ -487,9 +491,9 @@ if generate_clicked:
 
     # Basic text with topics and format
     if len(topics) != 0:
-        text_block = f"\n\n[TÓPICOS]\n{topics}\n\n[DIFICULDADE]\n{difficulty}\n\n[FORMATO DE SAÍDA]\n{load_file(f'data/edag_question_formats/{fmt_filter}') }"
+        text_block = f"\n\n[TÓPICOS]\n{topics}\n\n[DIFICULDADE]\n{difficulty}\n\n[FORMATO DE SAÍDA]\n{load_file(os.path.join(BASE_DIR, "data", "edag_question_formats", fmt_filter))}"
     else:
-        text_block = f"\n\n[TÓPICOS]\n{edag_content_list}\n\n[DIFICULDADE]\n{difficulty}\n\n[FORMATO DE SAÍDA]\n{load_file(f'data/edag_question_formats/{fmt_filter}') }"
+        text_block = f"\n\n[TÓPICOS]\n{edag_content_list}\n\n[DIFICULDADE]\n{difficulty}\n\n[FORMATO DE SAÍDA]\n{load_file(os.path.join(BASE_DIR, "data", "edag_question_formats", fmt_filter))}"
 
     # Adjust for user instructions
     if user_prompt:
