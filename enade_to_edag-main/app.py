@@ -467,27 +467,23 @@ generate_clicked = btn_col.button('Gerar Questão')
 # Question generation logic
 # Question generation logic
 if generate_clicked:
+
     if client is None:
-        st.warning(
-            "A funcionalidade de geração por IA está desabilitada porque a chave da Groq não foi configurada."
-        )
+        st.warning("A funcionalidade de geração por IA está desabilitada porque a chave da Groq não foi configurada.")
         st.stop()
 
     # Building up pipeline message
     msgs = []
 
-#if generate_clicked:       
-    # Building up pipeline message
-    
-#    msgs = []
     sys_content = (
-        "Sua função é gerar uma nova questão de prova dentro dos [TÓPICOS] fornecidos, na [DIFICULDADE] fornecida e seguindo exatamente o [FORMATO DE SAÍDA] \
-        fornecido através do preenchimento dos trechos indicados por '<>'. Não adicione comentários, cabeçalhos, explicações, saudações ou qualquer texto extra. \
-        Retorne apenas o texto da nova questão, nada mais. Caso haja [INSTRUÇÕES ADICIONAIS], siga exatamente o que for pedido. Caso haja uma imagem [ANEXO GRÁFICO], \
-        use como suporte gráfico na geração da nova questão. Por fim, caso haja uma imagem [QUESTÃO BASE], faça uma nova versão da questão base, ainda seguindo \
-        o [FORMATO DE SAÍDA] fornecido."
+        "Sua função é gerar uma nova questão de prova dentro dos [TÓPICOS] fornecidos, na [DIFICULDADE] fornecida e seguindo exatamente o [FORMATO DE SAÍDA] "
+        "fornecido através do preenchimento dos trechos indicados por '<>'. Não adicione comentários, cabeçalhos, explicações, saudações ou qualquer texto extra. "
+        "Retorne apenas o texto da nova questão, nada mais. Caso haja [INSTRUÇÕES ADICIONAIS], siga exatamente o que for pedido. Caso haja uma imagem [ANEXO GRÁFICO], "
+        "use como suporte gráfico na geração da nova questão. Por fim, caso haja uma imagem [QUESTÃO BASE], faça uma nova versão da questão base, ainda seguindo "
+        "o [FORMATO DE SAÍDA] fornecido."
     )
-    msgs.append({'role':'system','content':sys_content})
+
+    msgs.append({'role': 'system', 'content': sys_content})
 
     # Basic text with topics and format
     #if len(topics) != 0:
