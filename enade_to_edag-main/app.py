@@ -35,11 +35,15 @@ def encode_image_fileobj(file_obj):
     return base64.b64encode(file_obj.read()).decode('utf-8')
 
 # Function to load dataframe's edag topics information (and save it in cache)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 @st.cache_data
-def load_edag_topics(path='data/enade_data.csv'):
+def load_edag_topics(path=None):
+    if path is None:
+        path = os.path.join(BASE_DIR, "data", "enade_data.csv")
+
     df = pd.read_csv(path, converters={'test_content_edag': ast.literal_eval})
     return {row['year']: row['test_content_edag'] for _, row in df.iterrows()}
-
 # Function to validate question format
 def validate_question_format(text, fmt):
     # Question starts with “ENUNCIADO:” and contains “JUSTIFICATIVA:”?
