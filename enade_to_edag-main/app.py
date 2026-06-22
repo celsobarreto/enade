@@ -490,10 +490,44 @@ if generate_clicked:
     msgs.append({'role':'system','content':sys_content})
 
     # Basic text with topics and format
-    if len(topics) != 0:
-        text_block = f"\n\n[TÓPICOS]\n{topics}\n\n[DIFICULDADE]\n{difficulty}\n\n[FORMATO DE SAÍDA]\n{load_file(os.path.join(BASE_DIR, "data", "edag_question_formats", fmt_filter))}"
-    else:
-        text_block = f"\n\n[TÓPICOS]\n{edag_content_list}\n\n[DIFICULDADE]\n{difficulty}\n\n[FORMATO DE SAÍDA]\n{load_file(os.path.join(BASE_DIR, "data", "edag_question_formats", fmt_filter))}"
+    #if len(topics) != 0:
+     #   text_block = f"\n\n[TÓPICOS]\n{topics}\n\n[DIFICULDADE]\n{difficulty}\n\n[FORMATO DE SAÍDA]\n{load_file(os.path.join(BASE_DIR, "data", "edag_question_formats", fmt_filter))}"
+    #else:
+    #    text_block = f"\n\n[TÓPICOS]\n{edag_content_list}\n\n[DIFICULDADE]\n{difficulty}\n\n[FORMATO DE SAÍDA]\n{load_file(os.path.join(BASE_DIR, "data", "edag_question_formats", fmt_filter))}"
+
+# Arquivo de formato
+format_file = os.path.join(
+    BASE_DIR,
+    "data",
+    "edag_question_formats",
+    fmt_filter
+)
+
+# Basic text with topics and format
+if len(topics) != 0:
+    text_block = f"""
+[TÓPICOS]
+{topics}
+
+[DIFICULDADE]
+{difficulty}
+
+[FORMATO DE SAÍDA]
+{load_file(format_file)}
+"""
+else:
+    text_block = f"""
+[TÓPICOS]
+{edag_content_list}
+
+[DIFICULDADE]
+{difficulty}
+
+[FORMATO DE SAÍDA]
+{load_file(format_file)}
+"""
+
+
 
     # Adjust for user instructions
     if user_prompt:
