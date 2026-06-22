@@ -211,12 +211,26 @@ def show_history():
 
 # Initializing API client
 # key = load_file('data/keys/groq').strip()
-key = st.secrets["groq"]["key"]
-os.environ['OPENAI_API_KEY'] = key
-client = OpenAI(
-    base_url='https://api.groq.com/openai/v1',
-    api_key=os.environ['OPENAI_API_KEY'],
-)
+#alterado para poder instalar o app sem chave
+# key = st.secrets["groq"]["key"]
+#os.environ['OPENAI_API_KEY'] = key
+#client = OpenAI(
+#    base_url='https://api.groq.com/openai/v1',
+#    api_key=os.environ['OPENAI_API_KEY'],
+#)
+
+# Initializing API client
+try:
+    key = st.secrets["groq"]["key"]
+except Exception:
+    key = None
+client = None
+if key:
+    os.environ['OPENAI_API_KEY'] = key
+    client = OpenAI(
+        base_url='https://api.groq.com/openai/v1',
+        api_key=os.environ['OPENAI_API_KEY'],
+    )
 
 # key = load_file('data/keys/maritaca').strip()
 # key = st.secrets["maritaca"]["key"]
@@ -443,9 +457,21 @@ uploaded_graphic = upload_col.file_uploader('Suporte Gráfico (opcional)', type=
 generate_clicked = btn_col.button('Gerar Questão')
 
 # Question generation logic
+# Question generation logic
 if generate_clicked:
+    if client is None:
+        st.warning(
+            "A funcionalidade de geração por IA está desabilitada porque a chave da Groq não foi configurada."
+        )
+        st.stop()
+
     # Building up pipeline message
     msgs = []
+
+#if generate_clicked:       
+    # Building up pipeline message
+    
+#    msgs = []
     sys_content = (
         "Sua função é gerar uma nova questão de prova dentro dos [TÓPICOS] fornecidos, na [DIFICULDADE] fornecida e seguindo exatamente o [FORMATO DE SAÍDA] \
         fornecido através do preenchimento dos trechos indicados por '<>'. Não adicione comentários, cabeçalhos, explicações, saudações ou qualquer texto extra. \
