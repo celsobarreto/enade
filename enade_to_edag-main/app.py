@@ -465,7 +465,6 @@ uploaded_graphic = upload_col.file_uploader('Suporte Gráfico (opcional)', type=
 generate_clicked = btn_col.button('Gerar Questão')
 
 # Question generation logic
-# Question generation logic
 if generate_clicked:
 
     if client is None:
@@ -485,23 +484,17 @@ if generate_clicked:
 
     msgs.append({'role': 'system', 'content': sys_content})
 
+    # Arquivo de formato
+    format_file = os.path.join(
+        BASE_DIR,
+        "data",
+        "edag_question_formats",
+        fmt_filter
+    )
+
     # Basic text with topics and format
-    #if len(topics) != 0:
-     #   text_block = f"\n\n[TÓPICOS]\n{topics}\n\n[DIFICULDADE]\n{difficulty}\n\n[FORMATO DE SAÍDA]\n{load_file(os.path.join(BASE_DIR, "data", "edag_question_formats", fmt_filter))}"
-    #else:
-    #    text_block = f"\n\n[TÓPICOS]\n{edag_content_list}\n\n[DIFICULDADE]\n{difficulty}\n\n[FORMATO DE SAÍDA]\n{load_file(os.path.join(BASE_DIR, "data", "edag_question_formats", fmt_filter))}"
-
-# Arquivo de formato
-format_file = os.path.join(
-    BASE_DIR,
-    "data",
-    "edag_question_formats",
-    fmt_filter
-)
-
-# Basic text with topics and format
-if len(topics) != 0:
-    text_block = f"""
+    if len(topics) != 0:
+        text_block = f"""
 [TÓPICOS]
 {topics}
 
@@ -511,8 +504,8 @@ if len(topics) != 0:
 [FORMATO DE SAÍDA]
 {load_file(format_file)}
 """
-else:
-    text_block = f"""
+    else:
+        text_block = f"""
 [TÓPICOS]
 {edag_content_list}
 
@@ -523,16 +516,14 @@ else:
 {load_file(format_file)}
 """
 
-
-
     # Adjust for user instructions
     if user_prompt:
         text_block += f"\n\n[INSTRUÇÕES ADICIONAIS]\n{user_prompt}"
-    
+
     # Adding user content
     content_list = []
-    
-    # Adjut for graphic support
+
+    # Adjust for graphic support
     if uploaded_graphic is not None:
         graphic_b64 = encode_image_fileobj(uploaded_graphic)
         content_list.append({'type': 'text', 'text': '\n\n[ANEXO GRÁFICO]\n'})
@@ -543,39 +534,26 @@ else:
         path = st.session_state.selected_question['path']
         img_b64 = encode_image(path)
         content_list.append({'type': 'text', 'text': '\n\n[QUESTÃO BASE]\n'})
-        # content_list.append({'type':'image_url','image_url':{'url': f"data:image/png;base64,{img_b64}"}})
         content_list.append({'type':'image_url','image_url':{'url': st.session_state.selected_question['url']}})
-    
+
     # Creating message for groq models
     msgs.append({'role':'user','content':[{'type':'text','text':text_block}] + content_list})
-
-    # "Flattening" content for Maritaca's API
-    # flattened = text_block
-    # for item in content_list:
-    #     if item["type"] == "text":
-    #         flattened += item["text"]
-    #     
-    #     elif item["type"] == "image_url":
-    #         flattened += item["image_url"]["url"]
-
-    # msgs.append({"role": "user", "content": flattened})
 
     # Trying to generate question
     max_attempts = 3
     new_q = None
+    candidate = ""
     server_error = False
     for attempt in range(max_attempts):
         # API call
         try:
             resp = client.chat.completions.create(
-                # model="llama-3.3-70b-versatile",
                 model='meta-llama/llama-4-maverick-17b-128e-instruct',
-                # model='sabia-3.1',
                 messages=msgs,
                 temperature=0.8,
                 max_tokens=4096
             )
-        except:
+        except Exception:
             server_error = True
             break
 
@@ -600,13 +578,12 @@ else:
 
         st.session_state.show_modal_question = True
         st.session_state.modal_content = new_q
-    
+
     elif server_error:
-        server_error = False
         st.session_state.show_modal_question = True
         st.session_state.modal_content = ''
-        st.session_state.modal_error = f"Não consegui gerar a questão por problemas no servidor."
-    
+        st.session_state.modal_error = "Não consegui gerar a questão por problemas no servidor."
+
     else:
         candidate = candidate.replace('\n', '  \n')
 
@@ -627,7 +604,7 @@ if st.session_state.show_modal_enade:
     show_history()
 
 # Type mapping
-raw_types = sorted({questao.split('_')[0] for questao in os.listdir(f'data/visual_approach/prova_{2023}')})
+raw_types = sorted({questao.split('_')[0] for questao in os.listdir(os.path.join(BASE_DIR, 'data', 'visual_approach', f'prova_{2023}'))})
 type_map = {'closed': 'Fechada', 'open': 'Discursiva'}
 inv_type_map = {v: k for k, v in type_map.items()}
 
@@ -657,7 +634,7 @@ else:
     cols = st.columns([2, 2, 1])
 
     # Year selector
-    years = sorted([int(prova.split('_')[-1]) for prova in glob.glob('data/visual_approach/prova_*')])
+    years = sorted([int(os.path.basename(prova).split('_')[-1]) for prova in glob.glob(os.path.join(BASE_DIR, 'data', 'visual_approach', 'prova_*'))])
     with cols[0]:
         year_filter = st.selectbox('Ano da Prova', ['Todos'] + [str(y) for y in years], help='Filtro de seleção do(s) ano(s) de prova antiga a ser analisado. Note que o usuário também pode escolher analisar todos os anos de prova.')
 
@@ -676,7 +653,7 @@ else:
     all_qs = []
     for y in years:
         year_topics = edag_topics_by_year.get(y, {})
-        for fname in sorted(os.listdir(f'data/visual_approach/prova_{y}')):
+        for fname in sorted(os.listdir(os.path.join(BASE_DIR, 'data', 'visual_approach', f'prova_{y}'))):
             qtype_raw, _, num_ext = fname.partition('_question_')
             num = int(num_ext.split('.')[0])
 
@@ -694,8 +671,9 @@ else:
                 continue
             
             # Storing question
-            path = f'data/visual_approach/prova_{y}/{fname}'
-            all_qs.append({'year': y, 'type': qtype_raw, 'number': num, 'path': path, 'url': 'https://raw.githubusercontent.com/Luizerko/enade_to_edag/main/' + path})
+            relative_path = f"data/visual_approach/prova_{y}/{fname}"
+            path = os.path.join(BASE_DIR, "data", "visual_approach", f"prova_{y}", fname)
+            all_qs.append({'year': y, 'type': qtype_raw, 'number': num, 'path': path, 'url': 'https://raw.githubusercontent.com/Luizerko/enade_to_edag/main/' + relative_path})
 
     # Grouping questions
     grouped = {}
