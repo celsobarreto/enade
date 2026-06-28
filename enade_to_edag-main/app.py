@@ -224,17 +224,20 @@ def show_history():
 #)
 
 # Initializing API client
+key = None
+
 try:
     key = st.secrets["groq"]["key"]
-   # st.success("Chave da Groq carregada com sucesso!")
 except Exception:
-    key = None
+    pass
+
 client = None
+
 if key:
-    os.environ['OPENAI_API_KEY'] = key
+    os.environ["OPENAI_API_KEY"] = key
     client = OpenAI(
-        base_url='https://api.groq.com/openai/v1',
-        api_key=os.environ['OPENAI_API_KEY'],
+        base_url="https://api.groq.com/openai/v1",
+        api_key=key,
     )
 
 # key = load_file('data/keys/maritaca').strip()
@@ -556,6 +559,7 @@ if generate_clicked:
             )
         except Exception:
             server_error = True
+            st.session_state.modal_error = f"Erro da API Groq: {e}"
             break
 
         # Validating question
