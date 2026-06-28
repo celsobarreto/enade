@@ -226,7 +226,7 @@ def show_history():
 # Initializing API client
 try:
     key = st.secrets["groq"]["key"]
-    st.success("Chave da Groq carregada com sucesso!")
+   # st.success("Chave da Groq carregada com sucesso!")
 except Exception:
     key = None
 client = None
